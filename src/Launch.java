@@ -56,18 +56,6 @@ public class Launch extends Application implements EventHandler<ActionEvent> {
 
 
 
-//
-//        raf = new RAF();
-//        root = raf.createTree(4, raf.getRoot());
-
-        /*
-        root.businesses[0].setSimilar(root);
-        root.businesses[0].similar.sort(new Business());
-        root.businesses[0].similar.subList(4,174566).clear();
-*/
-
-
-
 
     }
 

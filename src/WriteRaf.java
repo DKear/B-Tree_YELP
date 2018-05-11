@@ -1,21 +1,12 @@
 import Clustering.KMeans;
 import Clustering.Point;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class WriteRaf implements Serializable {
-
-
-
-
-
-
-
 
 
     public static void main(String args[]) throws IOException {
@@ -41,13 +32,6 @@ public class WriteRaf implements Serializable {
                 double stars = obj.getDouble("stars");
                 int reviewCount = obj.getInt("review_count");
 
-                //JSONArray categoriesJ = obj.getJSONArray("categories");
-                //List categories = new ArrayList(categoriesJ.length());
-
-                //for(int i = 0; i < categoriesJ.length(); i++) {
-                //    categories.add(categoriesJ.toList().get(i));
-                //}
-                //
 
                 System.out.println("inserting: " + keycount);
 
@@ -72,7 +56,6 @@ public class WriteRaf implements Serializable {
             for(Point p: kmeans.points){
                 bTree.raf.writePoint(p, p.rafPos);
             }
-            //bTree.raf.pointsRaf.writeInt();
 
         }
         catch(Exception e){

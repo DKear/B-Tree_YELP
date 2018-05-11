@@ -1,3 +1,5 @@
+//Kmeans Class, implements points and clusters
+
 package Clustering;
 
 import java.io.Serializable;
@@ -25,12 +27,6 @@ public class KMeans implements Serializable{
             Point centroid = new Point(999999,r.nextDouble()*5,r.nextDouble()*20 ); //7361
             cluster.setCenter(centroid);
             clusters.add(cluster);
-        }
-    }
-
-    public void clearClusters(){
-        for(Cluster c : clusters){
-            c.points.clear();
         }
     }
 

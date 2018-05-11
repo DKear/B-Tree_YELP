@@ -1,8 +1,7 @@
+//Btree class
+
 import java.io.IOException;
-//import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
 public class BTree implements Serializable {
     int order = 32;
@@ -10,7 +9,6 @@ public class BTree implements Serializable {
     int t = order / 2; //min degree
     long nodePosition = 1;
     long businessPosition = 1;
-    long countPosition = 100;
     RAF raf = new RAF();
     int keyCount;
     //RandomAccessFile file;
@@ -19,15 +17,8 @@ public class BTree implements Serializable {
 
     }
 
-    /*
-    public BTree(RandomAccessFile file) throws IOException{
-        root = null;
-        this.file = file;
-        createTree(this);
 
-    }
-    */
-
+    //create blank tree, write it to RAF
     public void createTree() throws IOException{
         root = allocateNode();
         root.leaf = 1;
@@ -37,6 +28,7 @@ public class BTree implements Serializable {
         raf.setRoot(root.rafPos);
     }
 
+    //create blank node, write to RAF
     public Node allocateNode(){
         Node n = new Node();
         n.key = new int[order - 1];
@@ -50,7 +42,7 @@ public class BTree implements Serializable {
         return n;
     }
 
-
+    //Search B-tree and RAF for a business
     Business searchBusiness(Node n, int bKey) throws IOException{
         int i = 0;
         while(i < n.count && bKey > n.key[i]) {
@@ -64,21 +56,18 @@ public class BTree implements Serializable {
         }else{
             //disk read
             n = raf.readTree(order, n.childRafPos[i]);
-            /*for(int j = 0; j < n.children[i].count; j++){
-                n.children[i].businesses[j] = raf.readBusines(n.children[i].busiRafPos[j]);
-            }*/
+
             return searchBusiness(n, bKey);
         }
 
 
-        //return null;
 
     }
 
+    //Insert a business into the btree, if the root node is full, split it and then attempt the add
     void insert(int key, Business b) throws IOException{
         Node r = root;
         if (fullNode(r)){
-            //Node s = allocateNode();
             Node s = allocateNode();
             root = s;
             s.leaf = 0;
@@ -94,10 +83,10 @@ public class BTree implements Serializable {
             insertNonfull(r, key, b);
         }
         this.keyCount++;
-        //this.countPosition =
 
     }
 
+    //Checks if a node is full
     public boolean fullNode(Node n){
         for(int i = 0; i < n.key.length; i++){
             if (n.key[i] == 0){
@@ -107,9 +96,9 @@ public class BTree implements Serializable {
         return true;
     }
 
+    //Insert the node into a non-full node (simple insert)
     void insertNonfull(Node n, int key, Business b) throws IOException{
         int i = n.count - 1;
-        //Business nplusone = n.businesses.get(i+1);
 
         if (n.leaf==1) {
             while(i >= 0 && key < n.key[i]){
@@ -126,43 +115,31 @@ public class BTree implements Serializable {
             raf.writeTree(n, n.rafPos);
             businessPosition = raf.writeBusiness(b, b.rafPos);
         }
-        //!!!!!!!!!!!!!!!!!!!!!!!KEEP AN EYE ON THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!
         else {
             while (i >= 0 && key < n.key[i]) {
                 i--;
             }
             i++;
-            //read (child i of n)
 
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!END!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //n.children[i] =raf.readTree(order, n.childRafPos[i]);
-            /*
-            for(int j = 0; j < n.children[i].count; j++){
-                n.children[i].businesses[j] = raf.readBusines(n.children[i].busiRafPos[j]);
-            }
-            */
             if(fullNode(n.children[i])){
                 splitChild(n, i);
                 if(key > n.key[i]){
                     i++;
                 }
             }
-            //System.out.println("recursing");
             insertNonfull(n.children[i], key, b);
         }
     }
 
+    //split a child node
     void splitChild(Node n, int i) throws IOException{
-        //System.out.println("SPLITTING");
         //n is the parent
         //z is the new node/right node
         //Node z = allocateNode();
         Node z = allocateNode();
-        //y is the left node
         Node y = n.children[i];
         z.leaf = y.leaf;
         z.count = 0;
-        //z.count = t - 1;
 
         for(int j = 0; j < t - 1; j++){
             z.key[j] = y.key[j + t];
@@ -182,13 +159,11 @@ public class BTree implements Serializable {
                 z.childRafPos[j] = y.children[j + t].rafPos;
                 y.children[j + t] = null;
                 y.childRafPos[j + t] = 0;
-                //y.count--;
             }
 
         }
-        //y.count = t - 2;
 
-        //------------------KEEP AN EYE ON THIS LOOP--------------------
+        //shiftting values
         for(int j = n.count; j > i ; j--){
             n.children[j - 1] = n.children[j - 2];
             n.childRafPos[j - 1] = n.children[j - 2].rafPos;
@@ -203,7 +178,6 @@ public class BTree implements Serializable {
             n.busiRafPos[j - 1] = n.busiRafPos[j - 2];
             n.businesses[j - 2] = null;
             n.busiRafPos[j - 2] = 0;
-            //n.count--;
         }
 
         n.key[i] = y.key[t - 1];
@@ -217,71 +191,10 @@ public class BTree implements Serializable {
         raf.writeTree(y, y.rafPos);
         nodePosition = raf.writeTree(z, z.rafPos);
         raf.writeTree(n, n.rafPos);
-        //raf.write
-        /*
-        diskWrite(y);
-        diskWrite(z);
-        diskWrite(n);
-        */
+
 
     }
 
-//    public int readCount(){
-//        raf.readCount();
-//    }
 
-    /*
-    public Node diskRead(long position) throws IOException {
-        file.seek(position);
-        FileChannel fc = file.getChannel();
-        ByteBuffer b = ByteBuffer.allocate(nodeSize);
-        fc.read(b);
-        b.flip();
-        Node tempNode = new Node(-1);
-        tempNode.leaf = b.getInt();
-        tempNode.id = b.getInt();
-        tempNode.count = b.getInt();
-
-        for(int i = 0; i <2*t; i++){
-            tempNode.businesses.get(i).key = b.getInt();
-        }
-        for(int i = 0; i< 2*t; i++){
-            tempNode.children.get(i).id = b.getInt();
-        }
-        b.clear();
-        return tempNode;
-    }
-
-    public void diskWrite(Node node) throws IOException{
-        file.seek(node.id);
-        FileChannel f = file.getChannel();
-
-        ByteBuffer b = ByteBuffer.allocate(nodeSize);
-        b.putInt(node.leaf);
-        b.putLong(node.id);
-        b.putInt(node.count);
-
-        for(Business busi: node.businesses){
-            b.putInt(busi.key);
-        }
-        for(Node n: node.children){
-            for(int i = 0; i < n.children.size(); i++){
-                b.putLong(n.children.get(i).id);
-            }
-        }
-        b.flip();
-        f.write(b);
-        b.clear();
-    }
-    */
-
-    /*
-    public Node allocateNode() throws IOException{
-        file.seek(file.length());
-        Node temp = new Node(file.getFilePointer());
-        diskWrite(temp);
-        return temp;
-    }
-    */
 
 }

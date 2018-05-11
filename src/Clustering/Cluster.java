@@ -27,9 +27,6 @@ public class Cluster implements Serializable{
         return center;
     }
 
-    public String getCenterXY(){
-        return format.format(center.getX()) +", " + format.format(center.getY());
-    }
 
     public void setCenter(Point cp){
         center = cp;

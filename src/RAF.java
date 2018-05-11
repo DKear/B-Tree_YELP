@@ -32,16 +32,9 @@ public class RAF implements Serializable {
         return funcRaf.readLong();
     }
 
-    public long writeCount(int pos, int c) throws IOException{
-        funcRaf.seek(pos);
-        funcRaf.writeInt(c);
-        return funcRaf.getFilePointer();
-    }
 
-    public int readCount(int p) throws IOException{
-        funcRaf.seek(p);
-        return funcRaf.readInt();
-    }
+
+
 
     public long writeTree(Node n, long pos) throws IOException{
         treeRaf.seek(pos);
@@ -68,13 +61,6 @@ public class RAF implements Serializable {
         return treeRaf.getFilePointer();
     }
 
-//    public long writeKmeans(ArrayList<Point> points, long pos) throws IOException{
-//        kmeansRaf.seek(pos);
-//
-//        for(Point p : points){
-//
-//        }
-//    }
 
     public long writeBusiness(Business b, long pos) throws IOException{
         int n = 64;

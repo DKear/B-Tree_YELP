@@ -1,7 +1,7 @@
+//Points for clusters, points have their own RAF
 package Clustering;
 
 import java.io.Serializable;
-import java.util.Random;
 
 public class Point implements Serializable{
     private double x = 0;
@@ -54,11 +54,6 @@ public class Point implements Serializable{
         return Math.sqrt(Math.pow((c.getY() - p.getY()), 2) + Math.pow((c.getX() - p.getX()), 2));
     }
 
-    public Point randomPoint(){
-        Random r = new Random();
-        double x = r.nextDouble()*5;
-        double y = r.nextDouble()*7361;
-        return new Point(999999, x, y);
-    }
+
 
 }
